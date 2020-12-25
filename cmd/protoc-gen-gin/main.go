@@ -162,7 +162,7 @@ func generateSwag(g *protogen.GeneratedFile, service *protogen.Service, method *
 
 	if httpMethod == "get" {
 		for _, field := range method.Input.Fields {
-			g.P("// @Param ", field.Desc.Name(), ` query string false ""`)
+			g.P("// @Param ", field.Desc.Name(), ` query string false "`, field.GoName, `"`)
 		}
 	}
 
