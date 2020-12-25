@@ -164,6 +164,8 @@ func generateSwag(g *protogen.GeneratedFile, service *protogen.Service, method *
 		for _, field := range method.Input.Fields {
 			g.P("// @Param ", field.Desc.Name(), ` query string false "`, field.GoName, `"`)
 		}
+	} else {
+		g.P("// @Param req body ", g.QualifiedGoIdent(method.Input.GoIdent), ` true "request"`)
 	}
 
 	g.P("// @Success 200 {object} ", g.QualifiedGoIdent(method.Output.GoIdent), ` ""`)

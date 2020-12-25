@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/gu827356/pb-gin/pb_gen/googleapis/api/annotations"
 )
 
 func RegisterRoute(route gin.IRouter, rule *annotations.HttpRule, f func(c *gin.Context) (interface{}, error)) {
-	fmt.Println(rule)
 	switch pattern := rule.Pattern.(type) {
 	case *annotations.HttpRule_Get:
 		route.GET(pattern.Get, createHandlerFunc(f))
@@ -21,8 +21,8 @@ func RegisterRoute(route gin.IRouter, rule *annotations.HttpRule, f func(c *gin.
 		panic(fmt.Errorf("now not support this pattern: %+v", pattern))
 	}
 
-	for _, binding := range rule.AdditionalBindings {
-		RegisterRoute(route, binding, f)
+	for _, bind := range rule.AdditionalBindings {
+		RegisterRoute(route, bind, f)
 	}
 }
 
@@ -37,5 +37,9 @@ func createHandlerFunc(f func(c *gin.Context) (interface{}, error)) gin.HandlerF
 }
 
 func render(c *gin.Context, resp interface{}) {
-	c.JSON(http.StatusOK, resp)
+	if c.ContentType() == binding.MIMEPROTOBUF {
+		c.ProtoBuf(http.StatusOK, resp)
+	} else {
+		c.JSON(http.StatusOK, resp)
+	}
 }
