@@ -6,6 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/gu827356/pb-gin/pb_gen/googleapis/api/annotations"
 )
 
@@ -39,7 +41,49 @@ func createHandlerFunc(f func(c *gin.Context) (interface{}, error)) gin.HandlerF
 func render(c *gin.Context, resp interface{}) {
 	if c.ContentType() == binding.MIMEPROTOBUF {
 		c.ProtoBuf(http.StatusOK, resp)
+		return
+	}
+
+	if pbResp, ok := resp.(proto.Message); ok {
+		c.Render(http.StatusOK, jsonpbRender{
+			Data:      pbResp,
+			marshaler: &defaultJSONPBMarshaler,
+		})
 	} else {
 		c.JSON(http.StatusOK, resp)
+	}
+}
+
+var defaultJSONPBMarshaler = jsonpb.Marshaler{
+	OrigName:     true,
+	EnumsAsInts:  true,
+	EmitDefaults: true,
+}
+
+var jsonContentType = []string{"application/json; charset=utf-8"}
+
+type jsonpbRender struct {
+	Data      proto.Message
+	marshaler *jsonpb.Marshaler
+}
+
+func (j jsonpbRender) Render(writer http.ResponseWriter) error {
+	writeContentType(writer, jsonContentType)
+	d, err := j.marshaler.MarshalToString(j.Data)
+	if err != nil {
+		panic(err)
+	}
+	_, err = writer.Write([]byte(d))
+	return err
+}
+
+func (j jsonpbRender) WriteContentType(w http.ResponseWriter) {
+	writeContentType(w, jsonContentType)
+}
+
+func writeContentType(w http.ResponseWriter, value []string) {
+	header := w.Header()
+	if val := header["Content-Type"]; len(val) == 0 {
+		header["Content-Type"] = value
 	}
 }
