@@ -5,14 +5,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/gu827356/pb-gin/pb_gen/googleapis/api/annotations"
 )
 
 var (
 	protoForm      = protoFormBinding{}
 	protoMultipart = protoMultipartBinding{}
-	protoJSON      = protoJSONBinding{}
-	protoFormPost  = protoFormPostBinding{}
+	protoJSON      = protoJSONBinding{
+		Unmarshaler: jsonpb.Unmarshaler{AllowUnknownFields: true},
+	}
+	protoFormPost = protoFormPostBinding{}
 )
 
 func ParseRequest(c *gin.Context, in interface{}, _ *annotations.HttpRule) error {
