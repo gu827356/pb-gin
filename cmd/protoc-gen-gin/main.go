@@ -131,7 +131,7 @@ func generateRegisterMethod(g *protogen.GeneratedFile, service *protogen.Service
 	g.P(g.QualifiedGoIdent(ginsPackage.Ident("RegisterRoute")), "(rr.r, rule, func(c *", ginPackage.Ident("Context"), ")(interface{}, error) {")
 	g.P("req := ", g.QualifiedGoIdent(method.Input.GoIdent), "{}")
 	g.P("if err := ", g.QualifiedGoIdent(ginsPackage.Ident("ParseRequest")), "(c, &req, rule); err != nil {")
-	g.P("return nil, err")
+	g.P("return nil, ", g.QualifiedGoIdent(ginsPackage.Ident("NewRequestBindErr")), "(err)")
 	g.P("}")
 	g.P("return rr.svr.", method.GoName, "(c, &req)")
 	g.P("})")

@@ -1,0 +1,24 @@
+syntax = "proto3";
+package pb_gin.examples.hello_world;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/gu827356/pb-gin/examples/hello_world/temp";
+
+message HiReq {
+  string name = 1;
+  int64 id = 2;
+  int32 age = 3;
+}
+
+message HiResp {
+  string Msg = 1;
+}
+
+service HelloWorldService {
+  rpc Hi(HiReq) returns (HiResp) {
+    option (google.api.http) = {
+      post: "/hi"
+    };
+  }
+}

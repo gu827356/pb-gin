@@ -32,7 +32,15 @@ func createHandlerFunc(f func(c *gin.Context) (interface{}, error)) gin.HandlerF
 	return func(c *gin.Context) {
 		out, err := f(c)
 		if err != nil {
-			c.String(http.StatusInternalServerError, err.Error())
+			switch err.(type) {
+			case *RequestBindErr:
+				c.String(http.StatusBadRequest, err.Error())
+			default:
+				c.String(http.StatusInternalServerError, err.Error())
+				return
+			}
+			return
+
 		}
 		render(c, out)
 	}
