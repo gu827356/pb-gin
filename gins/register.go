@@ -32,6 +32,8 @@ func createHandlerFunc(f func(c *gin.Context) (interface{}, error)) gin.HandlerF
 	return func(c *gin.Context) {
 		out, err := f(c)
 		if err != nil {
+			c.Set(contextKeyError, err)
+
 			switch err.(type) {
 			case *RequestBindErr:
 				c.String(http.StatusBadRequest, err.Error())
@@ -41,6 +43,8 @@ func createHandlerFunc(f func(c *gin.Context) (interface{}, error)) gin.HandlerF
 			}
 			return
 
+		} else {
+			c.Set(contextKeyResponse, out)
 		}
 		render(c, out)
 	}

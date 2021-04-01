@@ -19,7 +19,13 @@ var (
 )
 
 func ParseRequest(c *gin.Context, in interface{}, _ *annotations.HttpRule) error {
-	return defaultBinding(c.Request.Method, c.ContentType()).Bind(c.Request, in)
+	err := defaultBinding(c.Request.Method, c.ContentType()).Bind(c.Request, in)
+	if err == nil {
+		c.Set(contextKeyRequest, in)
+	} else {
+		c.Set(contextKeyError, err)
+	}
+	return err
 }
 
 // 由于使用 proto 生成的 struct 没有 form tag，因此在这里 hack 下，使用 json tag 进行解析

@@ -14,3 +14,12 @@ go get -u github.com/gu827356/pb-gin/cmd/protoc-gen-gin
 ```bash
 protoc -I ${PROTO_IDL_DIR} --plugin=protoc-gen-gin --gin_out . --gin_opt=module=${YOUR_MODULE} xxxx.proto
 ```
+
+# How To
+## 如何从 context 中获取请求，响应和错误数据
+pb-gin 提供了三个 API 获取 context 中的这些数据。  
+```go
+    gins.RequestInContext()
+    gins.ResponseInContext()
+    gins.ErrorInContext()
+```
